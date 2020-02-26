@@ -149,18 +149,17 @@ static void copy_header(nsd_node_t *dest, nsd_node_t *src)
 
 static nsd_leaf_t *make_leaf(const nsd_key_t key, uint8_t key_len)
 {
+  size_t size;
   nsd_leaf_t *leaf;
 
-  if ((leaf = malloc(sizeof(*leaf))) == NULL) {
-    return NULL;
-  } else if ((leaf->key = malloc(key_len)) == NULL) {
-    free(leaf);
+  size = sizeof(nsd_leaf_t) + key_len;
+  if ((leaf = malloc(size)) == NULL) {
     return NULL;
   }
 
-  memcpy(leaf->key, key, key_len);
-  leaf->key_len = key_len;
   leaf->data = NULL;
+  leaf->key_len = key_len;
+  memcpy(leaf->key, key, key_len);
 
   return leaf;
 }
@@ -168,15 +167,7 @@ static nsd_leaf_t *make_leaf(const nsd_key_t key, uint8_t key_len)
 static void free_node(void *node)
 {
   if (node != NULL) {
-    if (nsd_is_leaf(node)) {
-      nsd_leaf_t *leaf = nsd_leaf_raw(node);
-      if (leaf->key != NULL) {
-        free(leaf->key);
-      }
-      free(leaf);
-    } else {
-      free(node);
-    }
+    free(nsd_is_leaf(node) ? nsd_leaf_raw(node) : node);
   }
 }
 

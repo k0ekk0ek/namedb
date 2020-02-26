@@ -140,9 +140,9 @@ struct nsd_node256 {
 
 typedef struct nsd_leaf nsd_leaf_t;
 struct nsd_leaf {
-  uint8_t key_len;
-  uint8_t *key;
   void *data;
+  uint8_t key_len;
+  uint8_t key[]; /* dynamically sized, avoids use of a pointer */
 };
 
 inline bool
